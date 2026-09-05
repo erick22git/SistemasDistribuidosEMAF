@@ -1,0 +1,41 @@
+package bo.edu.usfx.jgroups.remate;
+
+import java.io.Serializable;
+
+/**
+ * PARTE 2 - Modelo: una puja individual dentro de una Subasta.
+ *
+ * Es un dato puro (sin logica), forma parte del estado replicado que
+ * viaja dentro de Subasta -> historial.
+ */
+public class Puja implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private final String pujador;
+    private final double monto;
+    private final long instanteMillis; // momento en que el COORDINADOR la acepto
+
+    public Puja(String pujador, double monto, long instanteMillis) {
+        this.pujador = pujador;
+        this.monto = monto;
+        this.instanteMillis = instanteMillis;
+    }
+
+    public String getPujador() {
+        return pujador;
+    }
+
+    public double getMonto() {
+        return monto;
+    }
+
+    public long getInstanteMillis() {
+        return instanteMillis;
+    }
+
+    @Override
+    public String toString() {
+        return pujador + " -> " + monto;
+    }
+}
