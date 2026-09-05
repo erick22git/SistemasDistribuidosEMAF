@@ -16,36 +16,18 @@ import org.jgroups.Receiver;
 import org.jgroups.View;
 import org.jgroups.util.Util;
 
-/**
- * PARTE 1 - Pasos 4, 5 y 6: membresia, estado replicado y mensajes unicast.
- *
- * Uso (UDP, por defecto):
- *   mvn exec:java -Dexec.mainClass=bo.edu.usfx.jgroups.PizarraGrupo -Dexec.args="A"
- *
- * Uso (TCP, para el Paso 8 entre dos equipos):
- *   mvn exec:java -Dexec.mainClass=bo.edu.usfx.jgroups.PizarraGrupo -Dexec.args="A" ^
- *       -Dconfig=tcp.xml -Djgroups.bind_addr=192.168.1.25 ^
- *       -Djgroups.tcpping.initial_hosts=192.168.1.25[7800],192.168.1.30[7800]
- */
 public class PizarraGrupo implements Receiver {
 
     private JChannel canal;
     private final String nombre;
 
-    // ---- Paso 4: membresia ----
     private View vistaAnterior;
 
-    // ---- Paso 5: ESTADO REPLICADO. Cada nodo tiene su copia; JGroups las
-    // mantiene iguales via getState()/setState(). El acceso se protege con
-    // synchronized porque un hilo de JGroups (receive) puede modificarla al
-    // mismo tiempo que otro hilo la esta leyendo (getState o /historial).
     private final List<String> historial = new ArrayList<>();
 
     public PizarraGrupo(String nombre) {
         this.nombre = nombre;
     }
-
-    // ================== Membresia (Paso 4) ==================
 
     @Override
     public void viewAccepted(View vista) {
@@ -60,8 +42,6 @@ public class PizarraGrupo implements Receiver {
                 + " | miembros: " + vista.getMembers());
     }
 
-    // ================== Mensajes y estado replicado (Paso 5 y 6) ==================
-
     @Override
     public void receive(Message msg) {
         String texto = msg.getSrc() + ": " + msg.getObject();
@@ -74,7 +54,6 @@ public class PizarraGrupo implements Receiver {
 
     @Override
     public void getState(OutputStream salida) throws Exception {
-        // Lo ejecuta el nodo que YA tiene el estado (normalmente el coordinador)
         synchronized (historial) {
             Util.objectToStream(historial, new DataOutputStream(salida));
         }
@@ -84,7 +63,6 @@ public class PizarraGrupo implements Receiver {
     @Override
     @SuppressWarnings("unchecked")
     public void setState(InputStream entrada) throws Exception {
-        // Lo ejecuta el nodo que ACABA de entrar
         List<String> recibido = Util.objectFromStream(new DataInputStream(entrada));
         synchronized (historial) {
             historial.clear();
@@ -94,15 +72,12 @@ public class PizarraGrupo implements Receiver {
         recibido.forEach(l -> System.out.println("   " + l));
     }
 
-    // ================== Ciclo de vida ==================
-
     public void iniciar() throws Exception {
-        // -Dconfig=tcp.xml cambia la pila de protocolos sin tocar codigo (Paso 8)
         canal = new JChannel(System.getProperty("config", "udp.xml"));
         canal.name(nombre);
         canal.setReceiver(this);
         canal.connect("PizarraSIS258");
-        canal.getState(null, 10000); // pide el estado al coordinador (max 10 s)
+        canal.getState(null, 10000);
         leerTeclado();
         canal.close();
     }
@@ -124,12 +99,10 @@ public class PizarraGrupo implements Receiver {
             } else if (linea.startsWith("/privado ")) {
                 enviarPrivado(linea);
             } else {
-                canal.send(new ObjectMessage(null, linea)); // multicast al grupo
+                canal.send(new ObjectMessage(null, linea));
             }
         }
     }
-
-    // ================== Unicast (Paso 6) ==================
 
     private void enviarPrivado(String linea) throws Exception {
         String[] partes = linea.split(" ", 3);
@@ -142,12 +115,12 @@ public class PizarraGrupo implements Receiver {
             System.out.println("No existe el miembro " + partes[1]);
             return;
         }
-        canal.send(new ObjectMessage(destino, partes[2])); // unicast: solo a ese miembro
+        canal.send(new ObjectMessage(destino, partes[2]));
     }
 
     private Address buscarPorNombre(String nombreBuscado) {
         for (Address a : canal.getView().getMembers()) {
-            if (a.toString().equals(nombreBuscado)) return a; // nombre logico = toString()
+            if (a.toString().equals(nombreBuscado)) return a;
         }
         return null;
     }

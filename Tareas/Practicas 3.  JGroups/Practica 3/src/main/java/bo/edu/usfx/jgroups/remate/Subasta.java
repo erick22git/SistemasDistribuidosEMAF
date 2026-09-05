@@ -4,21 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * PARTE 2 - Modelo: una subasta, con su historial de pujas.
- *
- * IMPORTANTE (requisito 4 del enunciado): el instante de cierre se
- * guarda como INSTANTE ABSOLUTO (epoch millis), no como "segundos
- * restantes". Asi, si el objeto se serializa (getState/setState) o si
- * cambia el coordinador, el instante de cierre sigue siendo el mismo
- * sin importar cuanto tiempo tome la transferencia ni el reloj de la
- * maquina que lo procese despues.
- *
- * El instante de cierre lo calcula SIEMPRE el coordinador que acepta la
- * creacion de la subasta (ver NodoRemate), para que todos los nodos
- * compartan la misma hora de cierre sin depender de que sus relojes
- * locales esten sincronizados entre si.
- */
 public class Subasta implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -28,8 +13,8 @@ public class Subasta implements Serializable {
     private final String creador;
     private long instanteCierreMillis;
     private boolean cerrada;
-    private String ganador;      // null si nadie pujo
-    private Double montoFinal;   // null si nadie pujo
+    private String ganador;
+    private Double montoFinal;
 
     private final List<Puja> historial = new ArrayList<>();
 
@@ -89,12 +74,6 @@ public class Subasta implements Serializable {
         return historial;
     }
 
-    /**
-     * Mejor puja actual, o null si todavia no hay ninguna.
-     * Como cada puja aceptada debe superar a la anterior (lo valida el
-     * coordinador antes de difundirla), la ultima del historial es
-     * siempre la mejor.
-     */
     public Puja getMejorPuja() {
         if (historial.isEmpty()) {
             return null;

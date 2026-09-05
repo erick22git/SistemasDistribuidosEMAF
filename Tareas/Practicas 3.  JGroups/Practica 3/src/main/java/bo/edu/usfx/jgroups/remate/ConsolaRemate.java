@@ -3,19 +3,6 @@ package bo.edu.usfx.jgroups.remate;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-/**
- * PARTE 2 - Interfaz de consola: lee el teclado, interpreta comandos y
- * llama a los metodos publicos de NodoRemate. No conoce nada de
- * JGroups directamente (responsabilidad unica).
- *
- * Uso (UDP, por defecto):
- *   mvn exec:java -Dexec.mainClass=bo.edu.usfx.jgroups.remate.ConsolaRemate -Dexec.args="ana"
- *
- * Uso (TCP, para el Paso 8 / pruebas entre dos equipos):
- *   mvn exec:java -Dexec.mainClass=bo.edu.usfx.jgroups.remate.ConsolaRemate -Dexec.args="ana" ^
- *       -Dconfig=tcp.xml -Djgroups.bind_addr=192.168.1.25 ^
- *       -Djgroups.tcpping.initial_hosts=192.168.1.25[7800],192.168.1.30[7800]
- */
 public class ConsolaRemate {
 
     public static void main(String[] args) throws Exception {
@@ -50,7 +37,6 @@ public class ConsolaRemate {
                     imprimirAyuda();
 
                 } else if (linea.startsWith("/crear ")) {
-                    // /crear <articulo> <precio_base> <segundos>
                     String[] p = linea.split(" ");
                     if (p.length != 4) {
                         System.out.println("Uso: /crear <articulo> <precio_base> <segundos>");
@@ -59,7 +45,6 @@ public class ConsolaRemate {
                     }
 
                 } else if (linea.startsWith("/pujar ")) {
-                    // /pujar <articulo> <monto>
                     String[] p = linea.split(" ");
                     if (p.length != 3) {
                         System.out.println("Uso: /pujar <articulo> <monto>");
@@ -68,12 +53,10 @@ public class ConsolaRemate {
                     }
 
                 } else if (linea.startsWith("/estado ")) {
-                    // /estado <articulo>
                     String[] p = linea.split(" ", 2);
                     nodo.estado(p[1]);
 
                 } else if (linea.startsWith("/extender ")) {
-                    // /extender <articulo> <segundos>
                     String[] p = linea.split(" ");
                     if (p.length != 3) {
                         System.out.println("Uso: /extender <articulo> <segundos>");

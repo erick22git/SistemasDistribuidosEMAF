@@ -8,17 +8,6 @@ import org.jgroups.ObjectMessage;
 import org.jgroups.Receiver;
 import org.jgroups.View;
 
-/**
- * PARTE 1 - Paso 3: Chat de grupo sin servidor.
- *
- * A diferencia del cliente de la Practica 1 (que necesitaba un hilo
- * receptor propio), aqui el hilo receptor lo aporta JGroups: receive()
- * se ejecuta en un hilo interno de la biblioteca, mientras el hilo
- * principal se dedica solo a leer el teclado.
- *
- * Uso:
- *   mvn exec:java -Dexec.mainClass=bo.edu.usfx.jgroups.ChatGrupo -Dexec.args="ana"
- */
 public class ChatGrupo implements Receiver {
 
     private JChannel canal;
@@ -27,8 +16,6 @@ public class ChatGrupo implements Receiver {
     public ChatGrupo(String nombre) {
         this.nombre = nombre;
     }
-
-    // ---- Callbacks: los invoca un hilo de JGroups, NO el hilo principal ----
 
     @Override
     public void viewAccepted(View vista) {
@@ -39,8 +26,6 @@ public class ChatGrupo implements Receiver {
     public void receive(Message msg) {
         System.out.println(msg.getSrc() + "> " + msg.getObject());
     }
-
-    // ---- Ciclo de vida ----
 
     public void iniciar() throws Exception {
         canal = new JChannel();
@@ -57,7 +42,7 @@ public class ChatGrupo implements Receiver {
         String linea;
         while ((linea = teclado.readLine()) != null) {
             if (linea.equals("/salir")) break;
-            canal.send(new ObjectMessage(null, linea)); // null = todo el grupo
+            canal.send(new ObjectMessage(null, linea));
         }
     }
 

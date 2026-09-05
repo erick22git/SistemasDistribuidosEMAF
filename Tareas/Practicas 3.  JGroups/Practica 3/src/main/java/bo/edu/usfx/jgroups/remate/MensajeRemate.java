@@ -2,18 +2,6 @@ package bo.edu.usfx.jgroups.remate;
 
 import java.io.Serializable;
 
-/**
- * PARTE 2 - Mensaje del protocolo (requisito 3 del enunciado).
- *
- * En vez de mandar texto separado por simbolos (como en las Practicas 1
- * y 2), aqui cada mensaje es un objeto Java serializable con un tipo
- * explicito (TipoMensaje). JGroups lo serializa solo al envolverlo en
- * un ObjectMessage.
- *
- * Es una unica clase con campos opcionales (segun el tipo) en vez de
- * una jerarquia de subclases, para mantenerlo simple. Cada metodo
- * "fabrica" estatico deja claro que campos importan para cada tipo.
- */
 public class MensajeRemate implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -33,13 +21,11 @@ public class MensajeRemate implements Serializable {
     public String ganador;
     public Double montoFinal;
 
-    public String motivo; // usado en RECHAZO
+    public String motivo;
 
     private MensajeRemate(TipoMensaje tipo) {
         this.tipo = tipo;
     }
-
-    // ---- Fabricas: una por cada tipo de mensaje, para no armar el objeto a mano ----
 
     public static MensajeRemate propuestaSubasta(String articulo, double precioBase, int segundos, String creador) {
         MensajeRemate m = new MensajeRemate(TipoMensaje.PROPUESTA_SUBASTA);
