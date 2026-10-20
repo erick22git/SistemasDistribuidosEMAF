@@ -1,0 +1,11 @@
+{
+  "name": "cliente-node-elecciones-api",
+  "version": "1.0.0",
+  "description": "Cliente Node.js por consola para consumir la API REST de Elecciones (login + CRUD de Candidatos/Personas)",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "license": "ISC"
+}
